@@ -1,27 +1,36 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-
-Vue.use(VueRouter)
+import Vue from "vue";
+import VueRouter from "vue-router";
+import VueCookies from "vue-cookies";
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/",
+    name: "LoginView",
+    component: () => import("../views/LoginView.vue"),
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
-]
+    path: "/users",
+    name: "Users",
+    component: () => import("../views/UserView.vue"),
+  },
+  {
+    path: "/skills",
+    name: "Skills",
+    component: () => import("../views/SkillsView.vue"),
+  },
+];
 
 const router = new VueRouter({
-  routes
-})
+  routes,
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+  if (to.name !== "LoginView" && !VueCookies.get("token"))
+    next({ name: "LoginView" });
+  // if the user is not authenticated, `next` is called twice
+  else if (to.name == "LoginView" && VueCookies.get("token")) next("/users");
+  else next();
+});
+
+export default router;

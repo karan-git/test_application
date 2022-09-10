@@ -1,20 +1,35 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
+    <navbar-component v-if="$cookies.get('token')" />
+
+    <router-view />
   </div>
 </template>
 
+<script>
+import { mapState } from "vuex";
+import NavbarComponent from "./components/NavbarComponent.vue";
+export default {
+  computed: {
+    ...mapState(["apiSuccess", "errorMsg"]),
+  },
+  watch: {
+    errorMsg() {
+      if (!this.apiSuccess && this.errorMsg !== "") {
+        this.$toast.error(this.errorMsg);
+      }
+    },
+  },
+  components: { NavbarComponent },
+};
+</script>
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  height: 100%;
+}
+* {
+  margin: 0;
+  padding: 0;
 }
 
 nav {
